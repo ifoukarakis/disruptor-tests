@@ -11,27 +11,30 @@ import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.Sequencer;
 
 public class DisruptorConsumer implements EventHandler<ValueEvent>, Runnable {
-	private final AtomicLong value;
 	private final CountDownLatch startGate;
 	private final RingBuffer<ValueEvent> ringBuffer;
 	private final SequenceBarrier sequenceBarrier;
 	private final Sequence sequence = new Sequence(
 			Sequencer.INITIAL_CURSOR_VALUE);
-
+	
+	private long value;
 	private boolean halt = false;
 	
-	public DisruptorConsumer(AtomicLong value, CountDownLatch startGate,
+	public DisruptorConsumer(CountDownLatch startGate,
 			RingBuffer<ValueEvent> ringBuffer, SequenceBarrier sequenceBarrier) {
 		super();
-		this.value = value;
 		this.startGate = startGate;
 		this.ringBuffer = ringBuffer;
 		this.sequenceBarrier = sequenceBarrier;
+		this.value = 0l;
 		ringBuffer.setGatingSequences(this.sequence);
 	}
 
 	public void onEvent(ValueEvent event, long sequence, boolean endOfBatch) {
-		value.incrementAndGet();
+		if(event.getIncrease())
+			value++;
+		else
+			value--;
 	}
 
 	@Override

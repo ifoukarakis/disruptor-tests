@@ -6,30 +6,39 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BlockingQueueConsumer implements Runnable {
 	private final BlockingQueue<Boolean> queue;
-	private final AtomicLong value;
+	private long value;
+	private final long loops;
 	private final CountDownLatch startGate;
-	
-	public BlockingQueueConsumer(BlockingQueue<Boolean> queue, AtomicLong value, CountDownLatch startGate) {
+	private final CountDownLatch endGate;
+
+	public BlockingQueueConsumer(BlockingQueue<Boolean> queue, long loops,
+			CountDownLatch startGate, CountDownLatch endGate) {
 		super();
 		this.queue = queue;
-		this.value = value;
+		this.loops = loops;
 		this.startGate = startGate;
+		this.endGate = endGate;
 	}
 
 	public void run() {
 		try {
 			startGate.await();
 			Boolean item = Boolean.TRUE;
-			while(item.booleanValue()) {
+			for(int i = 0; i < loops; i++) {
 				item = queue.take();
 				if(item.booleanValue())
-					value.incrementAndGet();
+					value++;
+				else
+					value--;
 			}
-			queue.put(item);
+			endGate.countDown();
 		} catch(InterruptedException ie) {
 			Thread.currentThread().interrupt();
 		}
 
 	}
 
+	public long getValue() {
+		return value;
+	}
 }

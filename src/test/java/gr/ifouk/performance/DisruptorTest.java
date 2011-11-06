@@ -80,8 +80,7 @@ public class DisruptorTest extends TestCase {
 	    final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
 	    CountDownLatch startGate = new CountDownLatch(1);
 	    DisruptorProducer producer = new DisruptorProducer(LOOPS, startGate, ringBuffer);
-	    AtomicLong value = new AtomicLong(0l);
-	    DisruptorConsumer consumer = new DisruptorConsumer(value, startGate, ringBuffer, sequenceBarrier);
+	    DisruptorConsumer consumer = new DisruptorConsumer(startGate, ringBuffer, sequenceBarrier);
 		Thread p = new Thread(producer);
 		p.start();
 		Thread c = new Thread(consumer);
