@@ -83,8 +83,8 @@ public class DisruptorTest extends TestCase {
 	    CountDownLatch endLatch = new CountDownLatch(1);
 
 	    //Create producer and consumer
-	    DisruptorProducer producer = new DisruptorProducer(LOOPS, startLatch, ringBuffer);
-	    DisruptorConsumer consumer = new DisruptorConsumer(startLatch, endLatch, ringBuffer, sequenceBarrier, LOOPS);
+	    DisruptorProducer producer = new DisruptorProducer(LOOPS, ringBuffer, startLatch);
+	    DisruptorConsumer consumer = new DisruptorConsumer(ringBuffer, sequenceBarrier, LOOPS, startLatch, endLatch);
 	    
 	    //Create executor with a thread pool of two threads to run producer and consumer.
 		Executor executor = Executors.newFixedThreadPool(2);
@@ -98,9 +98,11 @@ public class DisruptorTest extends TestCase {
 		//Allow producer and consumer to start
 		startLatch.countDown();
 		
-		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished.
+		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished (added
+		//all items to ring buffer).
 		endLatch.await();
 		
 		long end = System.nanoTime();
-		System.out.println((end - start) + " nanoseconds for Disruptor (" + ringSize + ", "  + waitStrategy.name() +")");	}
+		System.out.println("Disruptor (" + ringSize + ", "  + waitStrategy.name() +")" + (end - start) + " nanoseconds");
+	}
 }

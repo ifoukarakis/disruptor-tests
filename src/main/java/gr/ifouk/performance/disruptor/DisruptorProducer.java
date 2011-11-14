@@ -11,8 +11,8 @@ public class DisruptorProducer implements Runnable {
 	private final Random random = new Random(System.currentTimeMillis());
 	private final RingBuffer<ValueEvent> ringBuffer;
 
-	public DisruptorProducer(long loops, CountDownLatch startGate,
-			RingBuffer<ValueEvent> ringBuffer) {
+	public DisruptorProducer(long loops, RingBuffer<ValueEvent> ringBuffer,
+			 CountDownLatch startGate) {
 		super();
 		this.loops = loops;
 		this.startGate = startGate;
@@ -23,16 +23,12 @@ public class DisruptorProducer implements Runnable {
 	public void run() {
 		try {
 			startGate.await();
-			for (long i = 1; i < loops; i++) {
+			for (long i = 0; i < loops; i++) {
 				long sequence = ringBuffer.next();
 				boolean next = random.nextBoolean();
 				ringBuffer.get(sequence).setIncrease(next);
 				ringBuffer.publish(sequence);
 			}
-			long sequence = ringBuffer.next();
-			ringBuffer.get(sequence).setIncrease(false);
-			ringBuffer.publish(sequence);
-
 		} catch (InterruptedException ie) {
 			Thread.currentThread().interrupt();
 		}

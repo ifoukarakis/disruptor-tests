@@ -19,8 +19,8 @@ public class DisruptorConsumer implements EventHandler<ValueEvent>, Runnable {
 	
 	private final long loops;
 	
-	public DisruptorConsumer(CountDownLatch startGate, CountDownLatch endGate,
-			RingBuffer<ValueEvent> ringBuffer, SequenceBarrier sequenceBarrier, long loops) {
+	public DisruptorConsumer(RingBuffer<ValueEvent> ringBuffer, SequenceBarrier sequenceBarrier, long loops, 
+			CountDownLatch startGate, CountDownLatch endGate) {
 		super();
 		this.startGate = startGate;
 		this.endGate = endGate;
@@ -42,13 +42,13 @@ public class DisruptorConsumer implements EventHandler<ValueEvent>, Runnable {
 	public void run() {
 		try {
 			//Number of items read
-			long count = 0;
+			long count = 0l;
 			
 			sequenceBarrier.clearAlert();
 			startGate.await();
 
 			ValueEvent event = null;
-			long nextSequence = sequence.get() + 1L;
+			long nextSequence = sequence.get() + 1l;
 			while (count < this.loops) {
 				try {
 					final long availableSequence = sequenceBarrier.waitFor(nextSequence);
@@ -60,7 +60,7 @@ public class DisruptorConsumer implements EventHandler<ValueEvent>, Runnable {
 						count++;
 					}
 
-					sequence.set(nextSequence - 1L);
+					sequence.set(nextSequence - 1l);
 				} catch (AlertException e) {
 					System.out.println("Disruptor Consumer ended unexpectedly!");
 					break;
