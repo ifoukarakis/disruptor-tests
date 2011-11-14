@@ -1,11 +1,8 @@
 package gr.ifouk.performance;
 
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 
 import junit.framework.TestCase;
-
-import com.lmax.disruptor.WaitStrategy;
 
 public class SingleThreadTest  extends TestCase {
 

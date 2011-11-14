@@ -1,13 +1,13 @@
 package gr.ifouk.performance;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
-
 import gr.ifouk.performance.disruptor.DisruptorConsumer;
 import gr.ifouk.performance.disruptor.DisruptorProducer;
 import gr.ifouk.performance.disruptor.ValueEvent;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import junit.framework.TestCase;
 
 import com.lmax.disruptor.ClaimStrategy;
@@ -73,23 +73,34 @@ public class DisruptorTest extends TestCase {
 
 	
 	private final void testDisruptorWithOptions(int ringSize, WaitStrategy.Option waitStrategy) throws InterruptedException {
+		//Create ring buffer
 		final RingBuffer<ValueEvent> ringBuffer =
 			    new RingBuffer<ValueEvent>(ValueEvent.EVENT_FACTORY, ringSize, 
 			                               ClaimStrategy.Option.SINGLE_THREADED,
 			                               waitStrategy);
 	    final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-	    CountDownLatch startGate = new CountDownLatch(1);
-	    DisruptorProducer producer = new DisruptorProducer(LOOPS, startGate, ringBuffer);
-	    DisruptorConsumer consumer = new DisruptorConsumer(startGate, ringBuffer, sequenceBarrier);
-		Thread p = new Thread(producer);
-		p.start();
-		Thread c = new Thread(consumer);
-		c.start();
+	    CountDownLatch startLatch = new CountDownLatch(1);
+	    CountDownLatch endLatch = new CountDownLatch(1);
+
+	    //Create producer and consumer
+	    DisruptorProducer producer = new DisruptorProducer(LOOPS, startLatch, ringBuffer);
+	    DisruptorConsumer consumer = new DisruptorConsumer(startLatch, endLatch, ringBuffer, sequenceBarrier, LOOPS);
+	    
+	    //Create executor with a thread pool of two threads to run producer and consumer.
+		Executor executor = Executors.newFixedThreadPool(2);
+		executor.execute(producer);
+		executor.execute(consumer);
+	   
+		//Perform garbage collection before starting the test in order to reduce possibility of 
+		//interfering with time measurement.
 		System.gc();
 		long start = System.nanoTime();
-		startGate.countDown();
-		p.join();
-		c.join();
+		//Allow producer and consumer to start
+		startLatch.countDown();
+		
+		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished.
+		endLatch.await();
+		
 		long end = System.nanoTime();
 		System.out.println((end - start) + " nanoseconds for Disruptor (" + ringSize + ", "  + waitStrategy.name() +")");	}
 }

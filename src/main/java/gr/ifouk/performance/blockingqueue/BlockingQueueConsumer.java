@@ -2,7 +2,6 @@ package gr.ifouk.performance.blockingqueue;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class BlockingQueueConsumer implements Runnable {
 	private final BlockingQueue<Boolean> queue;
