@@ -18,14 +18,14 @@ public class QueueComparison {
 			try {
 				queue = new ArrayBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueOneProducerOneConsumer(queue, LOOPS);
-				System.out.println("ArrayBlockingQueue (" + size + "), 1P 1C: " + result + " nanoseconds");
+				System.out.println("ArrayBlockingQueue (" + size + "), 1P 1C:\t" + result + " nanoseconds");
 			} catch (Exception e) {
 				System.out.println("ArrayBlockingQueue for size " + size + ", 1P 1C failed: " + e.getMessage());
 			}
 			try {
 				queue = new LinkedBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueOneProducerOneConsumer(queue, LOOPS);
-				System.out.println("LinkedBlockingQueue (" + size + "), 1P 1C: " + result + " nanoseconds");
+				System.out.println("LinkedBlockingQueue (" + size + "), 1P 1C:\t" + result + " nanoseconds");
 			} catch (Exception e) {
 				System.out.println("LinkedBlockingQueue for size " + size + ", 1P 1C failed: " + e.getMessage());
 			}
@@ -44,14 +44,14 @@ public class QueueComparison {
 			try {
 				queue = new ArrayBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueManyProducerOneConsumer(queue, 3, LOOPS);
-				System.out.println("ArrayBlockingQueue (" + size + "), 3P 1C: " + result + " nanoseconds");
+				System.out.println("ArrayBlockingQueue (" + size + "), 3P 1C:\t" + result + " nanoseconds");
 			} catch (Exception e) {
-				System.out.println("ArrayBlockingQueue for size " + size + ", 3P 1C failed: " + e.getMessage());
+				System.out.println("ArrayBlockingQueue for size " + size + ", 3P 1C failed:\t" + e.getMessage());
 			}
 			try {
 				queue = new LinkedBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueManyProducerOneConsumer(queue, 3, LOOPS);
-				System.out.println("LinkedBlockingQueue (" + size + "), 3P 1C: " + result + " nanoseconds");
+				System.out.println("LinkedBlockingQueue (" + size + "), 3P 1C:\t" + result + " nanoseconds");
 			} catch (Exception e) {
 				System.out.println("LinkedBlockingQueue for size " + size + ", 3P 1C failed: " + e.getMessage());
 			}

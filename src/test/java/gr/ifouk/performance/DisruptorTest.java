@@ -1,18 +1,8 @@
 package gr.ifouk.performance;
 
-import gr.ifouk.performance.disruptor.DisruptorConsumer;
-import gr.ifouk.performance.disruptor.DisruptorProducer;
-import gr.ifouk.performance.disruptor.ValueEvent;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
+import gr.ifouk.performance.disruptor.DisruptorTestUtils;
 import junit.framework.TestCase;
 
-import com.lmax.disruptor.ClaimStrategy;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SequenceBarrier;
 import com.lmax.disruptor.WaitStrategy;
 
 
@@ -21,88 +11,67 @@ public class DisruptorTest extends TestCase {
 	private static final long LOOPS = 500 * 1000 * 1000;
 	
 	public void testDisruptor256Yield() throws Exception {
-		testDisruptorWithOptions(256, WaitStrategy.Option.YIELDING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(256, LOOPS, WaitStrategy.Option.YIELDING);
+		System.out.println("Disruptor (256, YIELDING):\t" + value + " nanoseconds");
+
 	}
 
 	public void testDisruptor1024Yield() throws Exception {
-		testDisruptorWithOptions(1024, WaitStrategy.Option.YIELDING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(1024, LOOPS, WaitStrategy.Option.YIELDING);
+		System.out.println("Disruptor (1024, YIELDING):\t" + value + " nanoseconds");
 	}
 	
 	public void testDisruptor16x1024Yield() throws Exception {
-		testDisruptorWithOptions(16 * 1024, WaitStrategy.Option.YIELDING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(16 * 1024, LOOPS, WaitStrategy.Option.YIELDING);
+		System.out.println("Disruptor (16 * 1024, YIELDING):\t" + value + " nanoseconds");
 	}
 
 	public void testDisruptor256Blocking() throws Exception {
-		testDisruptorWithOptions(256, WaitStrategy.Option.BLOCKING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(256, LOOPS, WaitStrategy.Option.BLOCKING);
+		System.out.println("Disruptor (256, BLOCKING):\t" + value + " nanoseconds");
 	}
 
 	public void testDisruptor1024Blocking() throws Exception {
-		testDisruptorWithOptions(1024, WaitStrategy.Option.BLOCKING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(1024, LOOPS, WaitStrategy.Option.BLOCKING);
+		System.out.println("Disruptor (1024, BLOCKING):\t" + value + " nanoseconds");
 	}
 	
 	public void testDisruptor16x1024Blocking() throws Exception {
-		testDisruptorWithOptions(16 * 1024, WaitStrategy.Option.BLOCKING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(16 * 1024, LOOPS, WaitStrategy.Option.BLOCKING);
+		System.out.println("Disruptor (16 * 1024, BLOCKING):\t" + value + " nanoseconds");
+
 	}
 
-
 	public void testDisruptor256BusySpin() throws Exception {
-		testDisruptorWithOptions(256, WaitStrategy.Option.BUSY_SPIN);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(256, LOOPS, WaitStrategy.Option.BUSY_SPIN);
+		System.out.println("Disruptor (256, BUSY SPIN):\t" + value + " nanoseconds");
 	}
 
 	public void testDisruptor1024BusySpin() throws Exception {
-		testDisruptorWithOptions(1024, WaitStrategy.Option.BUSY_SPIN);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(1024, LOOPS, WaitStrategy.Option.BUSY_SPIN);
+		System.out.println("Disruptor (1024, BUSY SPIN):\t" + value + " nanoseconds");
 	}
 	
 	public void testDisruptor16x1024BusySpin() throws Exception {
-		testDisruptorWithOptions(16 * 1024, WaitStrategy.Option.BUSY_SPIN);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(16 * 1024, LOOPS, WaitStrategy.Option.BUSY_SPIN);
+		System.out.println("Disruptor (16 * 1024, BUSY SPIN):\t" + value + " nanoseconds");
 	}
 	
 
 	public void testDisruptor256Sleep() throws Exception {
-		testDisruptorWithOptions(256, WaitStrategy.Option.SLEEPING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(256, LOOPS, WaitStrategy.Option.SLEEPING);
+		System.out.println("Disruptor (256, SLEEPING):\t" + value + " nanoseconds");
 	}
 
 	public void testDisruptor1024Sleep() throws Exception {
-		testDisruptorWithOptions(1024, WaitStrategy.Option.SLEEPING);
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(1024, LOOPS, WaitStrategy.Option.SLEEPING);
+		System.out.println("Disruptor (1024, SLEEPING):\t" + value + " nanoseconds");
+
 	}
 	
 	public void testDisruptor16x1024Sleep() throws Exception {
-		testDisruptorWithOptions(16 * 1024, WaitStrategy.Option.SLEEPING);
-	}
+		long value = DisruptorTestUtils.testDisruptorOneProducerOneConsumerWithOptions(16 * 1024, LOOPS, WaitStrategy.Option.SLEEPING);
+		System.out.println("Disruptor (16 * 1024, SLEEPING):\t" + value + " nanoseconds");
 
-
-	
-	private final void testDisruptorWithOptions(int ringSize, WaitStrategy.Option waitStrategy) throws InterruptedException {
-		//Create ring buffer
-		final RingBuffer<ValueEvent> ringBuffer =
-			    new RingBuffer<ValueEvent>(ValueEvent.EVENT_FACTORY, ringSize, 
-			                               ClaimStrategy.Option.SINGLE_THREADED,
-			                               waitStrategy);
-	    final SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();
-	    CountDownLatch startLatch = new CountDownLatch(1);
-	    CountDownLatch endLatch = new CountDownLatch(1);
-
-	    //Create producer and consumer
-	    DisruptorProducer producer = new DisruptorProducer(LOOPS, ringBuffer, startLatch);
-	    DisruptorConsumer consumer = new DisruptorConsumer(ringBuffer, sequenceBarrier, LOOPS, startLatch, endLatch);
-	    
-	    //Create executor with a thread pool of two threads to run producer and consumer.
-		Executor executor = Executors.newFixedThreadPool(2);
-		executor.execute(producer);
-		executor.execute(consumer);
-	   
-		//Perform garbage collection before starting the test in order to reduce possibility of 
-		//interfering with time measurement.
-		System.gc();
-		long start = System.nanoTime();
-		//Allow producer and consumer to start
-		startLatch.countDown();
-		
-		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished (added
-		//all items to ring buffer).
-		endLatch.await();
-		
-		long end = System.nanoTime();
-		System.out.println("Disruptor (" + ringSize + ", "  + waitStrategy.name() +")" + (end - start) + " nanoseconds");
 	}
 }

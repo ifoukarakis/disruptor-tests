@@ -1,14 +1,9 @@
 package gr.ifouk.performance;
 
-import gr.ifouk.performance.blockingqueue.BlockingQueueConsumer;
-import gr.ifouk.performance.blockingqueue.BlockingQueueProducer;
 import gr.ifouk.performance.blockingqueue.BlockingQueueTestUtils;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import junit.framework.TestCase;

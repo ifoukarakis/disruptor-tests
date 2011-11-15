@@ -2,13 +2,13 @@ package gr.ifouk.performance.blockingqueue;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BlockingQueueTestUtils {
 
 	public static final long testBlockingQueueOneProducerOneConsumer(BlockingQueue<Boolean> queue, long loops) throws Exception {
+		System.out.println("Starting 1 producer, 1 consumer, queue: " + queue.getClass().getSimpleName());
 		//Create start and end latch
 		CountDownLatch startLatch = new CountDownLatch(1);
 		CountDownLatch endLatch = new CountDownLatch(1);
@@ -31,8 +31,12 @@ public class BlockingQueueTestUtils {
 		
 		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished.
 		endLatch.await();
-		executor.shutdown();
+		
 		long end = System.nanoTime();
+
+		//Cleanup executor
+		executor.shutdown();
+
 		return (end - start);
 	}
 	
@@ -54,10 +58,13 @@ public class BlockingQueueTestUtils {
 			return -1l;
 		}
 		
+		System.out.println("Starting " + producers + " producer(s), 1 consumer, queue: " + queue.getClass().getSimpleName());
+				
+		
 		//Check if thread count greater than number of cores/cpu's.
 		int processors = Runtime.getRuntime().availableProcessors();
-		if(producers + 2 > processors) {
-			System.out.println((producers + 2) + " running on " + processors + " processors. Context switching will happen more often!");
+		if(producers + 1 > processors) {
+			System.out.println((producers + 1) + " running on " + processors + " processors. Context switching will happen more often!");
 		}
 		
 		//Create start and end latch
@@ -73,24 +80,33 @@ public class BlockingQueueTestUtils {
 		producer[producers - 1] = new BlockingQueueProducer(queue, loopsPerProducer + (loops % producers), startLatch);
 		BlockingQueueConsumer consumer = new BlockingQueueConsumer(queue, loops, startLatch, endLatch);
 		
-		//Create executor with a thread pool of (producer count + 1) threads to run producers and consumer.
-		ExecutorService executor = Executors.newFixedThreadPool(producers + 1);
-		for(BlockingQueueProducer p: producer) {
-			executor.submit(p);
-		}
+		//Create executor with a thread pool of size equal to the number of producers.
+		//Note that we'll use the executor service to run the consumer and all the producers
+		//except for one. One producer will be run by the current thread.
+		ExecutorService executor = Executors.newFixedThreadPool(producers);
+		
 		executor.submit(consumer);
+		for(int i = 1; i < producers ; i++) {
+			executor.submit(producer[i]);
+		}
 		
 		//Perform garbage collection before starting the test in order to reduce possibility of 
 		//interfering with time measurement.
 		System.gc();
 		long start = System.nanoTime();
-		//Allow producer and consumer to start
+		//Allow producers and consumer to start
 		startLatch.countDown();
+		
+		//Run one producer in current thread.
+		producer[0].run();
 		
 		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished.
 		endLatch.await();
 		long end = System.nanoTime();
+		
+		//Cleanup executor
 		executor.shutdown();
+		
 		return (end - start);
 	}
 }
