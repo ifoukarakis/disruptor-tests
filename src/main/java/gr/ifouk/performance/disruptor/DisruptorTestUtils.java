@@ -26,8 +26,7 @@ public class DisruptorTestUtils {
 	    DisruptorConsumer consumer = new DisruptorConsumer(ringBuffer, sequenceBarrier, loops, startLatch, endLatch);
 	    
 	    //Create executor with a thread pool of two threads to run producer and consumer.
-		ExecutorService executor = Executors.newFixedThreadPool(2);
-		executor.execute(producer);
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(consumer);
 	   
 		//Perform garbage collection before starting the test in order to reduce possibility of 
@@ -36,6 +35,9 @@ public class DisruptorTestUtils {
 		long start = System.nanoTime();
 		//Allow producer and consumer to start
 		startLatch.countDown();
+		
+		//Start producer
+		producer.run();
 		
 		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished (added
 		//all items to ring buffer).

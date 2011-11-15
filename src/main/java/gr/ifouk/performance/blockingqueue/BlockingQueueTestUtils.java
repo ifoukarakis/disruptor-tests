@@ -17,9 +17,9 @@ public class BlockingQueueTestUtils {
 		BlockingQueueProducer producer = new BlockingQueueProducer(queue, loops, startLatch);
 		BlockingQueueConsumer consumer = new BlockingQueueConsumer(queue, loops, startLatch, endLatch);
 		
-		//Create executor with a thread pool of two threads to run producer and consumer.
-		ExecutorService	executor = Executors.newFixedThreadPool(2);
-		executor.submit(producer);
+		//Create executor with a thread pool of two threads to run consumer.
+		//Producer will be run by current thread.
+		ExecutorService	executor = Executors.newSingleThreadExecutor();
 		executor.submit(consumer);
 		
 		//Perform garbage collection before starting the test in order to reduce possibility of 
@@ -28,6 +28,9 @@ public class BlockingQueueTestUtils {
 		long start = System.nanoTime();
 		//Allow producer and consumer to start
 		startLatch.countDown();
+		
+		//Run single producer
+		producer.run();
 		
 		//Await for consumer to end. Note that the consumer cannot finish unless the producer has finished.
 		endLatch.await();
