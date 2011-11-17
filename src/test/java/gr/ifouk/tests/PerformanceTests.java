@@ -1,4 +1,4 @@
-package gr.ifouk.performance;
+package gr.ifouk.tests;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

@@ -1,4 +1,4 @@
-package gr.ifouk.performance.disruptor;
+package gr.ifouk.tests.disruptor;
 
 import java.util.concurrent.CountDownLatch;
 

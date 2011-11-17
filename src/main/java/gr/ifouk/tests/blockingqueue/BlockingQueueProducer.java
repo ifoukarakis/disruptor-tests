@@ -1,4 +1,4 @@
-package gr.ifouk.performance.blockingqueue;
+package gr.ifouk.tests.blockingqueue;
 
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;

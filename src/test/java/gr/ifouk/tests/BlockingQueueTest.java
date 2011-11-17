@@ -1,6 +1,6 @@
-package gr.ifouk.performance;
+package gr.ifouk.tests;
 
-import gr.ifouk.performance.blockingqueue.BlockingQueueTestUtils;
+import gr.ifouk.tests.blockingqueue.BlockingQueueTestUtils;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
