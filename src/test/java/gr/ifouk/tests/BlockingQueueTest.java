@@ -1,4 +1,4 @@
-package gr.ifouk.performance;
+package gr.ifouk.tests;
 
 import gr.ifouk.tests.blockingqueue.BlockingQueueTestUtils;
 

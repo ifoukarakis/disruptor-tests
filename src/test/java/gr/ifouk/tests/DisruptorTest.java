@@ -1,4 +1,4 @@
-package gr.ifouk.performance;
+package gr.ifouk.tests;
 
 import gr.ifouk.tests.disruptor.DisruptorTestUtils;
 import junit.framework.TestCase;
