@@ -1,1 +1,7 @@
 Disruptor tests.
+================
+
+This code uses the Disruptor library (http://code.google.com/p/disruptor/),
+which is distrubuted under the Apache License 2.0.
+
+The Apache License 2.0 is available at http://www.apache.org/licenses/LICENSE-2.0.

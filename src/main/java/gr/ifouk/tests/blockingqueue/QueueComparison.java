@@ -14,7 +14,7 @@ public class QueueComparison {
 		//One producer, one consumer
 		int size = 64;
 		long result;
-		for(int i = 6; i < 20; i++) {
+		for(int i = 6; i < 25; i++) {
 			try {
 				queue = new ArrayBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueOneProducerOneConsumer(queue, LOOPS);
@@ -40,7 +40,7 @@ public class QueueComparison {
 		//One producer, one consumer
 		int size = 64;
 		long result;
-		for(int i = 6; i < 18; i++) {
+		for(int i = 6; i < 25; i++) {
 			try {
 				queue = new ArrayBlockingQueue<Boolean>(size);
 				result = BlockingQueueTestUtils.testBlockingQueueManyProducerOneConsumer(queue, 3, LOOPS);
