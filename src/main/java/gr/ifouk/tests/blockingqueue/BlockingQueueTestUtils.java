@@ -22,9 +22,15 @@ public class BlockingQueueTestUtils {
 		ExecutorService	executor = Executors.newSingleThreadExecutor();
 		executor.submit(consumer);
 		
-		//Perform garbage collection before starting the test in order to reduce possibility of 
-		//interfering with time measurement.
+		//Request garbage collector to run and wait for it.
 		System.gc();
+		try {
+			Thread.sleep(1000);
+		} catch(InterruptedException e) {
+
+		}
+		System.out.println("Starting...");
+		
 		long start = System.nanoTime();
 		//Allow producer and consumer to start
 		startLatch.countDown();
@@ -93,9 +99,14 @@ public class BlockingQueueTestUtils {
 			executor.submit(producer[i]);
 		}
 		
-		//Perform garbage collection before starting the test in order to reduce possibility of 
-		//interfering with time measurement.
+		//Request garbage collector to run and wait for it.
 		System.gc();
+		try {
+			Thread.sleep(1000);
+		} catch(InterruptedException e) {
+
+		}
+		System.out.println("Starting...");
 		long start = System.nanoTime();
 		//Allow producers and consumer to start
 		startLatch.countDown();
