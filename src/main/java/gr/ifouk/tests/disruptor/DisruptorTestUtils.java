@@ -25,6 +25,8 @@ public class DisruptorTestUtils {
 	    DisruptorProducer producer = new DisruptorProducer(loops, ringBuffer, startLatch);
 	    DisruptorConsumer consumer = new DisruptorConsumer(ringBuffer, sequenceBarrier, loops, startLatch, endLatch);
 	    
+	    ringBuffer.setGatingSequences(consumer.getSequence());
+	    
 	    //Create executor with a thread pool of two threads to run producer and consumer.
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(consumer);
@@ -32,6 +34,12 @@ public class DisruptorTestUtils {
 		//Perform garbage collection before starting the test in order to reduce possibility of 
 		//interfering with time measurement.
 		System.gc();
+		try {
+			Thread.sleep(1000);
+		} catch(InterruptedException ie) {
+			
+		}
+		
 		long start = System.nanoTime();
 		//Allow producer and consumer to start
 		startLatch.countDown();
@@ -81,6 +89,7 @@ public class DisruptorTestUtils {
 	    	producer[i] = new DisruptorProducer(loopsPerProducer, ringBuffer, startLatch);
 	    }
 	    DisruptorConsumer consumer = new DisruptorConsumer(ringBuffer, sequenceBarrier, loops, startLatch, endLatch);
+	    ringBuffer.setGatingSequences(consumer.getSequence());
 	    
 	    //Create executor with a thread pool of two threads to run producer and consumer.
 		ExecutorService executor = Executors.newFixedThreadPool(producers);
@@ -93,6 +102,12 @@ public class DisruptorTestUtils {
 		//interfering with time measurement.
 		System.gc();
 		long start = System.nanoTime();
+		try {
+			Thread.sleep(1000);
+		} catch(InterruptedException ie) {
+			
+		}
+		
 		//Allow producer and consumer to start
 		startLatch.countDown();
 		

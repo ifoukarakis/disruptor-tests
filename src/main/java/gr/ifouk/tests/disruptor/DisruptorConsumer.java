@@ -38,6 +38,18 @@ public class DisruptorConsumer implements EventHandler<ValueEvent>, Runnable {
 			value--;
 	}
 
+	public long getValue() {
+		return value;
+	}
+
+	public void setValue(long value) {
+		this.value = value;
+	}
+
+	public Sequence getSequence() {
+		return sequence;
+	}
+
 	@Override
 	public void run() {
 		try {
